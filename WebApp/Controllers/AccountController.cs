@@ -123,7 +123,7 @@ namespace WebApp.Controllers
             // Create claims for the token
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, username),
+                new Claim("Name", username),
                 new Claim("UserType", userType)
             };
 

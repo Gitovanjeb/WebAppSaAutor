@@ -246,6 +246,7 @@
     <Content Include="Pages\Registration.html" />
     <Content Include="Pages\Search.html" />
     <Content Include="Pages\SearchandSort.html" />
+    <Content Include="Scripts\jwt-decode.js" />
     <Content Include="Views\Proizvodi\proizvod.css" />
     <Content Include="Database\Podaci\proizvodi.txt" />
     <Content Include="favicon.ico" />

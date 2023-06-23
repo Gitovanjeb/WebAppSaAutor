@@ -11,10 +11,10 @@ public class KupacProfilController : ApiController
 {
     // GET api/profile
   //  [Authorize]
-    public IHttpActionResult Get()
+    public IHttpActionResult Get(string username)
     {
         // Retrieve the user information from the JWT token's claims
-        string username = Request.Headers.GetValues("Username").FirstOrDefault();
+       // string username = Request.Headers.GetValues("Username").FirstOrDefault();
 
         // Retrieve the user profile from your existing database using Baza.korisnici.Values.ToList()
         List<Korisnik> korisnici = Baza.korisnici.Values.ToList();
@@ -29,37 +29,33 @@ public class KupacProfilController : ApiController
 
     // PUT api/profile
     //[Authorize]
-    public IHttpActionResult Put(Korisnik updatedUser)
+    public IHttpActionResult Put(string username, Korisnik updateUser)
     {
         // Retrieve the user information from the JWT token's claims
-        ClaimsIdentity identity = User.Identity as ClaimsIdentity;
-        if (identity == null)
-        {
-            return BadRequest("Invalid token.");
-        }
-
-        string username = identity.FindFirst(ClaimTypes.Name)?.Value;
-
-        // Retrieve the user profile from your existing database using Baza.korisnici.Values.ToList()
         List<Korisnik> korisnici = Baza.korisnici.Values.ToList();
-        Korisnik existingUser = korisnici.FirstOrDefault(u => u.Ime == username);
-        if (existingUser == null)
+        Korisnik korisnik = korisnici.FirstOrDefault(u => u.KorisnickoIme == username);
+        if (korisnik == null)
         {
             return NotFound();
         }
 
-        // Update the user information
-        existingUser.Ime = updatedUser.Ime ?? existingUser.Ime;
-        existingUser.Prezime = updatedUser.Prezime ?? existingUser.Prezime;
-        existingUser.Lozinka = updatedUser.Lozinka ?? existingUser.Lozinka;
-        existingUser.Email = updatedUser.Email ?? existingUser.Email;
-        if (updatedUser.DatumRodjenja != DateTime.MinValue)
+
+
+
+
+
+        korisnik.Ime = updateUser.Name ?? korisnik.Ime;
+        korisnik.Prezime = Request.Form["updatedSurname"] ?? korisnik.Prezime;
+        korisnik.Lozinka = Request.Form["updatedPassword"] ?? korisnik.Lozinka;
+        korisnik.Email = Request.Form["updatedEmail"] ?? korisnik.Email;
+        DateTime dateOfBirth;
+        if (DateTime.TryParse(Request.Form["updatedDateOfBirth"], out dateOfBirth))
         {
-            existingUser.DatumRodjenja = updatedUser.DatumRodjenja;
+            korisnik.DateOfBirth = dateOfBirth;
         }
-        return Ok(existingUser);
+
+
     }
-}
 
 /*public class User
 {

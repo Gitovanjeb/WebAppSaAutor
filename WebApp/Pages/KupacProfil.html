@@ -7,14 +7,14 @@
     <script src="../Scripts/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jwt-decode/2.2.0/jwt-decode.min.js"></script>
-    
+    <script src="../Scripts/jwt-decode.js"></script>
 </head>
 <body>
     <h1>Profile Page</h1>
 
     <div id="profileInfo">
         <h3>User Information</h3>
-        <p id="username">vvvvy</p>
+        <p id="username"></p>
         <p id="name"></p>
         <p id="surname"></p>
         <p id="email"></p>
@@ -33,50 +33,35 @@
 
     <script>
         $(document).ready(function () {
-            console.log('a');
-            function getUserProfile() {
-                // Retrieve the token from local storage
-                var token = localStorage.getItem('token');
-                console.log(token);
-                if (token) {
-                    // Decoding the JWT token to extract the username
-                    var decodedToken = jwt_decode(token);
-                    var username = decodedToken.username;
+            var token = localStorage.getItem('token');
+            console.log(token);
+            if (token) {
+                var decodedToken = jwt_decode(token);
+                var username = decodedToken.Name;
+                $('#username').text('Username: ' + username);
 
-                    // Make the AJAX request to retrieve the user profile
-                    $.ajax({
-                        url: '/api/KupacProfil/Get',
-                        type: 'GET',
-                        headers: {
-                            'Authorization': 'Bearer ' + token,
-                            'Username': username
-                        },
-                        success: function (data) {
-                            displayUserProfile(data);
-                        },
-                        error: function () {
-                            alert('Error occurred while retrieving user profile.');
-                        }
-                    });
-                } else {
-                    // Handle the case when the token is not found in local storage
-                    alert('Token not found in local storage.');
-                }
+                $.ajax({
+                    url: '/api/KupacProfil/Get?username=' + username,
+                    type: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (data) {
+                        $('#name').text('Name: ' + data.Ime);
+                        $('#surname').text('Surname: ' + data.Prezime);
+                        $('#email').text('Email: ' + data.Email);
+                        $('#dateOfBirth').text('Date of Birth: ' + data.DatumRodjenja);
+                        $('#updateForm').show();
+                    },
+                    error: function () {
+                        alert('Error occurred while retrieving user profile.');
+                    }
+                });
+            } else {
+                alert('Token not found in local storage.');
             }
 
-
-            function displayUserProfile(profile) {
-                $('#username').text('Username: ' + profile.KorisnickoIme);
-                $('#name').text('Name: ' + profile.Ime);
-                $('#surname').text('Surname: ' + profile.Prezime);
-                $('#email').text('Email: ' + profile.Email);
-                $('#dateOfBirth').text('Date of Birth: ' + profile.DatumRodjenja);
-
-                // Show the update form
-                $('#updateForm').show();
-            }
-
-            function updateUserProfile() {
+            $('#updateButton').click(function () {
                 var updatedUser = {
                     Name: $('#updatedName').val(),
                     Surname: $('#updatedSurname').val(),
@@ -86,21 +71,23 @@
                 };
 
                 $.ajax({
-                    url: '/api/KupacProfil/Put',
+                    url: '/api/KupacProfil/Put?username=' + username;
                     type: 'PUT',
                     data: JSON.stringify(updatedUser),
                     contentType: 'application/json',
                     success: function (data) {
-                        displayUserProfile(data);
+                        $('#name').text('Name: ' + data.Ime);
+                        $('#surname').text('Surname: ' + data.Prezime);
+                        $('#email').text('Email: ' + data.Email);
+                        $('#dateOfBirth').text('Date of Birth: ' + data.DatumRodjenja);
                         alert('User profile updated successfully.');
                     },
                     error: function () {
                         alert('Error occurred while updating user profile.');
                     }
                 });
-            }
+            });
         });
-            
     </script>
 </body>
 </html>
